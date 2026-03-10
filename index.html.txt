@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Tienda Empresa</title>
+
+<style>
+
+body{
+margin:0;
+font-family:Arial;
+background:#f2f2f2;
+}
+
+header{
+background:#131921;
+color:white;
+padding:15px;
+display:flex;
+justify-content:space-between;
+}
+
+h1{margin:0}
+
+.container{
+padding:20px;
+}
+
+.admin{
+background:white;
+padding:15px;
+border-radius:10px;
+margin-bottom:20px;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+gap:20px;
+}
+
+.producto{
+background:white;
+padding:10px;
+border-radius:10px;
+box-shadow:0 4px 10px rgba(0,0,0,0.1);
+text-align:center;
+}
+
+.producto img{
+width:100%;
+height:200px;
+object-fit:cover;
+border-radius:8px;
+}
+
+button{
+padding:10px;
+border:none;
+background:#ff9900;
+cursor:pointer;
+border-radius:5px;
+}
+
+.carrito{
+position:fixed;
+right:0;
+top:60px;
+width:280px;
+background:white;
+height:100%;
+padding:15px;
+box-shadow:-5px 0 10px rgba(0,0,0,0.2);
+overflow:auto;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>Mi Tienda</h1>
+<div>Total: <span id="total">0</span> €</div>
+</header>
+
+<div class="container">
+
+<div class="admin">
+<h3>Panel Administrador</h3>
+
+<input id="nombre" placeholder="Producto">
+<input id="precio" type="number" placeholder="Precio">
+<input id="imagen" type="file">
+
+<button onclick="crearProducto()">Crear producto</button>
+</div>
+
+<div class="grid" id="productos"></div>
+
+</div>
+
+<div class="carrito">
+<h3>Carrito</h3>
+<ul id="lista"></ul>
+<button onclick="comprar()">Finalizar compra</button>
+</div>
+
+<script>
+
+let productos=JSON.parse(localStorage.getItem("productos"))||[]
+let total=0
+
+function guardar(){
+localStorage.setItem("productos",JSON.stringify(productos))
+}
+
+function render(){
+
+let cont=document.getElementById("productos")
+cont.innerHTML=""
+
+productos.forEach((p,i)=>{
+
+cont.innerHTML+=`
+<div class="producto">
+<img src="${p.img}">
+<h4>${p.nombre}</h4>
+<p>${p.precio} €</p>
+<button onclick="addCarrito('${p.nombre}',${p.precio})">Comprar</button>
+</div>
+`
+
+})
+
+}
+
+function crearProducto(){
+
+let nombre=document.getElementById("nombre").value
+let precio=document.getElementById("precio").value
+let archivo=document.getElementById("imagen").files[0]
+
+if(!nombre||!precio||!archivo){
+alert("Completa los datos")
+return
+}
+
+let reader=new FileReader()
+
+reader.onload=function(e){
+
+productos.push({
+nombre:nombre,
+precio:Number(precio),
+img:e.target.result
+})
+
+guardar()
+render()
+
+}
+
+reader.readAsDataURL(archivo)
+
+}
+
+function addCarrito(nombre,precio){
+
+let li=document.createElement("li")
+li.innerText=nombre+" - "+precio+"€"
+document.getElementById("lista").appendChild(li)
+
+total+=precio
+document.getElementById("total").innerText=total
+
+}
+
+function comprar(){
+alert("Pedido realizado (aquí conectarías PayPal o Stripe)")
+}
+
+render()
+
+</script>
+
+</body>
+</html>
